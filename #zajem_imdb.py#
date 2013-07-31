@@ -38,7 +38,7 @@ def preveri_film(the_page):
 
     f, g = open('test_neurejeno.txt', 'w'), open('test_iter.txt', 'w')
 
-    #f.write(etree.tostring(root))
+    f.write(etree.tostring(root))
     for element in root.iter():
         g.write("%s - %s" % (element.tag, element.text))
     
