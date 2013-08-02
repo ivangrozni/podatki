@@ -82,7 +82,7 @@ def podatki_filma(the_page):
     root = etree.HTML(the_page, parser) # Mogoce bi to moralo biti ze prej...
     
     str_budget = str_gross = str_review = str_meta = False
-    str_genre = str_rating = str_duration = ''
+    str_genre = str_rating = str_duration = str_drzava = ''
     # OSNOVNI PODATKI
     str_naslov = root.findall(".//meta[@content]")[5].get("content") ## naslov in letnica
     str_rating = root.findall(".//div[@title]")[0].get("title") ## rating, st_users
@@ -123,6 +123,8 @@ def podatki_filma(the_page):
     else: rating = nr_users = "None"
     if len(str_duration) != 0: duration = re.sub(" min", "", str_duration)
     else: duration = "None"
+    if len(str_drzava) != 0: drzava = str_drzava#re.sub(" min", "", str_duration)
+    else: drzava = "None"
     if len(str_genre) != 0: genre = re.split(" ", str_genre)[1]
     else: genre = "None"
     if str_budget != False: budget = re.sub("$|[a-zA-Z]+|\(|,|\)|\s", "", str_budget)
@@ -139,7 +141,7 @@ def podatki_filma(the_page):
     else: metascore = nr_metacritic = "None"
 
     #print naslov, letnica, str_drzava, duration, genre, rating, nr_users, budget, gross, nr_reviews, metascore, nr_metacritic
-    return naslov.encode('UTF-8'), letnica.encode('UTF-8'), str_drzava.encode('UTF-8'), duration.encode('UTF-8'), genre.encode('UTF-8'), rating.encode('UTF-8'), nr_users.encode('UTF-8'), budget.encode('UTF-8'), gross.encode('UTF-8'), nr_reviews.encode('UTF-8'), metascore.encode('UTF-8'), nr_metacritic.encode('UTF-8')
+    return naslov.encode('UTF-8'), letnica.encode('UTF-8'), drzava.encode('UTF-8'), duration.encode('UTF-8'), genre.encode('UTF-8'), rating.encode('UTF-8'), nr_users.encode('UTF-8'), budget.encode('UTF-8'), gross.encode('UTF-8'), nr_reviews.encode('UTF-8'), metascore.encode('UTF-8'), nr_metacritic.encode('UTF-8')
 
 
 def zajemi_vse(n):
