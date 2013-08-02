@@ -1,0 +1,11 @@
+#ID	imdbID	naslov	letnica	drzava	duration	zanr	imdbRating	nr_users	gross	budget	nr_reviews	metascore	nr_metacritics
+1	2062649	2012	USA	5	Short	None	None	None	None	None	None	None	Split Ends, I Feel Wonderful 
+2	0077996	1978	USA	99	Drama	7.2	11	None	None	None	None	None	No Longer Alone 
+3	1972744	2000	UK	56	Documentary	6.5	6	None	None	1	None	None	RAF: Coastal Command 
+4	0073652	1975	India	None	Drama	7.6	10	None	None	None	None	None	Samaya 
+5	0192337	1933	China	None	None	None	None	None	None	None	None	None	Mu xing zhi guang 
+6	0218007	1897	UK	None	Short	None	None	None	None	None	None	None	Ascot Races Arrival of the Prince of Wales 
+7	0401090	1971	South Korea	None	Crime	None	None	None	None	None	None	None	72K diamondreul chajara 
+8	1400384	2009	UK	12	Short	8.2	17	None	None	None	None	None	Anglesey Road 
+9	0344840	2002	France	15	Short	None	None	None	None	None	None	None	Angèle 
+10	0367056	1914	USA	None	Comedy	None	None	None	None	None	None	None	Slippery Slim and the Claim Agent 
