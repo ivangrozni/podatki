@@ -1,11 +1,11 @@
-#ID	imdbID	naslov	letnica	drzava	duration	zanr	imdbRating	nr_users	gross	budget	nr_reviews	metascore	nr_metacritics
-1	2062649	2012	USA	5	Short	None	None	None	None	None	None	None	Split Ends, I Feel Wonderful 
-2	0077996	1978	USA	99	Drama	7.2	11	None	None	None	None	None	No Longer Alone 
-3	1972744	2000	UK	56	Documentary	6.5	6	None	None	1	None	None	RAF: Coastal Command 
-4	0073652	1975	India	None	Drama	7.6	10	None	None	None	None	None	Samaya 
-5	0192337	1933	China	None	None	None	None	None	None	None	None	None	Mu xing zhi guang 
-6	0218007	1897	UK	None	Short	None	None	None	None	None	None	None	Ascot Races Arrival of the Prince of Wales 
-7	0401090	1971	South Korea	None	Crime	None	None	None	None	None	None	None	72K diamondreul chajara 
-8	1400384	2009	UK	12	Short	8.2	17	None	None	None	None	None	Anglesey Road 
-9	0344840	2002	France	15	Short	None	None	None	None	None	None	None	Angèle 
-10	0367056	1914	USA	None	Comedy	None	None	None	None	None	None	None	Slippery Slim and the Claim Agent 
+#ID	imdbID	letnica	drzava	duration	zanr	imdbRating	nr_users	gross	budget	nr_reviews	metascore	nr_metacritics	naslov
+1	0211940	1997	Canada	95	Documentary	7.1	15	None	None	1	None	None	The Battle of Vimy Ridge - Part 1: Setting the Stage 
+2	1070284	2007	Germany	89	Drama	6.2	41	None	None	1	None	None	Alte Freunde 
+3	1347022	2008	France	27	Short	7.3	16	€6000	None	1	None	None	Cam2Cam 
+4	0061177	1966	Japan	76	Adventure	6	5,962	None	None	43	None	None	What's Up, Tiger Lily? 
+5	0061712	1967	USA	80	Drama	5.4	38	None	None	2	None	None	The Girl, the Body, and the Pill 
+6	1555000	1945	France	4	Short	9.6	14	None	None	None	None	None	Hiver 1945 
+7	2191332	2012	Germany	100	Drama	6.8	333	None	None	1	None	None	Gözetleme Kulesi 
+8	0810804	2005	USA	7	Short	7.9	7	None	None	None	None	None	The Clothing Line 
+9	0180798	1998	Netherlands	50	Animation	5.1	21	None	None	None	None	None	The Legend of Mulan 
+10	0082700	1981	Italy	86	Adventure	5.1	5,041	None	None	89	None	None	Cannibal ferox 

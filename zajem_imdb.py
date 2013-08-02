@@ -5,26 +5,40 @@ import urllib2#, datetime
 import random
 import re
 
-def vzorec(n, ime="test.txt"):
-    """Vrne datoteko s podatki o n filmih"""
+def vzorec(n, ime="test.txt", vec_podatkov = True):
+    """Vrne datoteko s podatki o n filmih
+    Input: n - stevilo filmov; ime - ime datoteke z bazo filmov (ustvari se nova datoteka)
+    vec_podatkov - Ce je True, mora film imeti cas trajanja in imdb rating, da se zapise v datoteko.
+    Output: Datoteka s filmi (za obdelavo v R)"""
     f = open(ime, 'w')
-    f.write("#ID\timdbID\tnaslov\tletnica\tdrzava\tduration\tzanr\timdbRating\tnr_users\tgross\tbudget\tnr_reviews\tmetascore\tnr_metacritics\n")
-    i = j = 0
+    f.write("#ID\timdbID\tletnica\tdrzava\tduration\tzanr\timdbRating\tnr_users\tgross\tbudget\tnr_reviews\tmetascore\tnr_metacritics\tnaslov\n")
+    i = j = f = 0 # stevec, stevec ne filmov, stevec filmov brez podatkov
     while i<n:
         index = kandidat_str()
-        print index
+        print index;
         film = zajem(index)
         if preveri_film(film):
+            f += 1
             p = podatki_filma(film)
-            try:
-                f.write("%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (i+1, index, p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9], p[10], p[11], p[0]) )
-                i += 1
-            except UnicodeEncodeError: # Tezava je v budget in gross za drzave s cudnimi valutami
-                print "film po gobe"
+            if vec_podatkov:
+                if p[3] != "None" and p[5] != "None": #Mora imeti cas trajanja in rating
+                    try:
+                        f.write("%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (i+1, index, p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9], p[10], p[11], p[0]) )
+                        i += 1
+                        print " film s podatki: %s" % p[0]
+                    except UnicodeEncodeError: # Tezava je v budget in gross za drzave s cudnimi valutami
+                        print "film po gobe"
+            else:
+                try:
+                    f.write("%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (i+1, index, p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9], p[10], p[11], p[0]) )
+                    i += 1
+                    print " film brez podatkov: %s" %p[0]
+                except UnicodeEncodeError: # Tezava je v budget in gross za drzave s cudnimi valutami
+                    print "film po gobe"
         j += 1
         
     f.close()
-    return "pregledanih: ", j, "nefilmov: ", j-n, "delez: ", n*1.0/j
+    return "pregledanih: ", j, "nefilmov: ", j-n, "delez filmov: ", n*1.0/j, "filmi brez podatkov: ", f - n, "delez filmov s podatki: ", n/f
 
 def kandidat_str():
     kandidat=random.randint(1, 2400000)
