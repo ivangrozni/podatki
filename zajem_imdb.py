@@ -12,13 +12,13 @@ def vzorec(n, ime="test.txt", vec_podatkov = True):
     Output: Datoteka s filmi (za obdelavo v R)"""
     f = open(ime, 'w')
     f.write("#ID\timdbID\tletnica\tdrzava\tduration\tzanr\timdbRating\tnr_users\tgross\tbudget\tnr_reviews\tmetascore\tnr_metacritics\tnaslov\n")
-    i = j = f = 0 # stevec, stevec ne filmov, stevec filmov brez podatkov
+    i = j = nf = 0 # stevec, stevec ne filmov, stevec filmov brez podatkov
     while i<n:
         index = kandidat_str()
         print index;
         film = zajem(index)
         if preveri_film(film):
-            f += 1
+            nf += 1
             p = podatki_filma(film)
             if vec_podatkov:
                 if p[3] != "None" and p[5] != "None": #Mora imeti cas trajanja in rating
@@ -32,13 +32,13 @@ def vzorec(n, ime="test.txt", vec_podatkov = True):
                 try:
                     f.write("%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (i+1, index, p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9], p[10], p[11], p[0]) )
                     i += 1
-                    print " film brez podatkov: %s" %p[0]
                 except UnicodeEncodeError: # Tezava je v budget in gross za drzave s cudnimi valutami
                     print "film po gobe"
+                print " film brez podatkov: %s" %p[0]
         j += 1
         
     f.close()
-    return "pregledanih: ", j, "nefilmov: ", j-n, "delez filmov: ", n*1.0/j, "filmi brez podatkov: ", f - n, "delez filmov s podatki: ", n/f
+    return "pregledanih: ", j, "nefilmov: ", j-n, "delez filmov: ", n*1.0/j, "filmi brez podatkov: ", nf - n, "delez filmov s podatki: ", n*1.0/nf
 
 def kandidat_str():
     kandidat=random.randint(1, 2400000)
