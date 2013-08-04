@@ -40,6 +40,7 @@ TO DO list
    1) Kodo naredi preglednejso
    2) Objektno programiranje
    3) Proper Error Handling
+   4) Time - merjenje casa - koliko casa program dela...
 
 ##############################
 
@@ -47,3 +48,8 @@ Navodila za zajem_imdb.py:
 
 Klices funkcijo vzorec(n), ki vrne datoteko z n filmi.
 Manjkajoci podatki imajo vrednost None - veliko je manjkajocih podatkov :(
+
+##############################
+
+Dodal se malce errorHandlinga...
+sockettimeout, ker se je program obesal...
