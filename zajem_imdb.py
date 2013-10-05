@@ -190,7 +190,7 @@ def also_like(root):
     seznam = []
     for div in DIV:
         s = div.get("data-tconst")
-        imdbID = int(re.sub("tt", "", s))
+        imdbID = re.sub("tt", "", s)
         if imdbID not in seznam: seznam.append(imdbID)
     return seznam
 
@@ -199,8 +199,6 @@ def drevo_zajem(n, seznam, SEZNAM, N = 1000, ime = "drevo.txt"): # Tukaj bi se d
     """N - omejitev stevila filmov, seznam - filmi za pregledat, SEZNAM - ze pregledani filmi
     Output: #Seznam filmov v drevesu - Bi si zelel - je pa samo file s podatki filmov
     """
-    #SEZNAM = [startID] # kateri filmi so sedaj za preverit
-    #seznam = [] # kateri filmi bodo za preverit pol
     i = 0
     SEZ = []
     f = open(ime, 'a')
@@ -213,7 +211,7 @@ def drevo_zajem(n, seznam, SEZNAM, N = 1000, ime = "drevo.txt"): # Tukaj bi se d
             try:
                 f.write("%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (n+i+1, index, p[1], p[3], p[5], p[6], p[7], p[8], p[9], p[10], p[11], p[12], p[2], p[4], p[0]) )
                 i += 1
-                print "%d film s podatki: %s\t, %s\ti: %d, %d" % (index, p[0], p[1], i, n+i)
+                print "%s film s podatki: %s\t, %s\ti: %d, %d" % (index, p[0], p[1], i, n+i)
             except UnicodeEncodeError: # Tezava je v budget in gross za drzave s cudnimi valutami
                 print "film po gobe"
             for imdbID in sez:
