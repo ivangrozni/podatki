@@ -5,7 +5,7 @@ import urllib2#, datetime
 import random
 import re
 import socket
-#import time # da se malce postopa, koliko casa traja zajem...
+import time # da se malce postopa, koliko casa traja zajem...
 
 timeout = 5 # seconds
 socket.setdefaulttimeout(timeout)
@@ -15,8 +15,9 @@ def vzorec(n, ime="test.txt", vec_podatkov = True):
     Input: n - stevilo filmov; ime - ime datoteke z bazo filmov (ustvari se nova datoteka)
     vec_podatkov - Ce je True, mora film imeti cas trajanja in imdb rating, da se zapise v datoteko.
     Output: Datoteka s filmi (za obdelavo v R)"""
+    ti = time.time()
     f = open(ime, 'w')
-    f.write("#ID\timdbID\tletnica\tduration\timdbRating\tnr_users\tgross\tbudget\tnr_reviews\tmetascore\tnr_metacritics\tdrzava\tzanr\tnaslov\n")
+    f.write("#ID\timdbID\tletnica\tduration\timdbRating\tnr_users\tgross\tbudget\tnr_reviews\tnr_critics\tmetascore\tnr_metacritics\tdrzava\tzanr\tnaslov\n")
     i = j = nf = 0 # stevec, stevec ne filmov, stevec filmov brez podatkov
     while i<n:
         index = kandidat_str()
@@ -26,9 +27,10 @@ def vzorec(n, ime="test.txt", vec_podatkov = True):
             nf += 1
             p = podatki_filma(film)
             if vec_podatkov:
-                if p[3] != "None" and p[5] != "None": #Mora imeti cas trajanja in rating
+                #if p[3] != "None" and p[5] != "None" and p[8] != "None": #Mora imeti cas trajanja in rating
+                if "None" not in p:
                     try:
-                        f.write("%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (i+1, index, p[1], p[3], p[5], p[6], p[7], p[8], p[9], p[10], p[11], p[2], p[4], p[0]) )
+                        f.write("%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (i+1, index, p[1], p[3], p[5], p[6], p[7], p[8], p[9], p[10], p[11], p[12], p[2], p[4], p[0]) )
                         i += 1
                         print " film s podatki: %s\t, %s\ti: %d" % (p[0], p[1], i)
                         #print "pregledanih: ", j, "nefilmov: ", j-n, "delez filmov: ", n*1.0/j, "filmi brez podatkov: ", nf - n, "delez filmov s podatki: ", n*1.0/nf
@@ -37,7 +39,7 @@ def vzorec(n, ime="test.txt", vec_podatkov = True):
                 else: print " film brez podatkov: %s\t%s" % (p[0], p[1])
             else:
                 try:
-                    f.write("%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (i+1, index, p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9], p[10], p[11], p[0]) )
+                    f.write("%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (i+1, index, p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9], p[10], p[11], p[12], p[0]) )
                     i += 1
                 except UnicodeEncodeError: # Tezava je v budget in gross za drzave s cudnimi valutami
                     print "film po gobe"
@@ -45,7 +47,8 @@ def vzorec(n, ime="test.txt", vec_podatkov = True):
         j += 1
         
     f.close()
-    return "pregledanih: ", j, "nefilmov: ", j-n, "delez filmov: ", n*1.0/j, "filmi brez podatkov: ", nf - n, "delez filmov s podatki: ", n*1.0/nf
+    ti = time.time() - ti
+    return "pregledanih: ", j, "nefilmov: ", j-nf, "delez filmov: ", n*1.0/j, "filmi brez podatkov: ", nf - n, "delez filmov s podatki: ", n*1.0/nf, "cas: ", ti
 
 def kandidat_str():
     kandidat=random.randint(1, 2400000)
@@ -91,8 +94,8 @@ def preveri_film(root): # FILM MORA TUDI BITI KONCAN!!!
 
 def podatki_filma(root):
     """Poisce podatke:"""
-    str_budget = str_gross = str_review = str_meta = False
-    str_genre = str_rating = str_duration = str_drzava = ''
+    str_budget = str_gross = str_meta = False
+    str_genre = str_rating = str_duration = str_drzava = str_review = str_critics = ''
     # OSNOVNI PODATKI
     META = root.findall(".//meta[@content]")#[5].get("content") ## naslov in letnica
     for meta in META:
@@ -109,10 +112,10 @@ def podatki_filma(root):
         else: str_rating = ''
     span = root.findall(".//span[@itemprop]") ## st_review, st_critic, genre
     for s in span: 
-        if s.get("itemprop") == "reviewCount": str_review = s.text
+        if s.get("itemprop") == "reviewCount":
+            str_review = str_review + s.text + "\n"
         elif s.get("itemprop") == "genre":
             str_genre += (' ' + s.text) # !!! append !!!
-            break
     TIME  = root.findall(".//time[@itemprop]")# runtime...kaj naredi, ce je vec runtimov?
     for time in TIME:
         if time.get("itemprop") == "duration":
@@ -123,11 +126,12 @@ def podatki_filma(root):
         if div.get("class") == "txt-block":
             for child in div:
                 if child.tag == "h4":
-                    if child.text == "Budget:": str_budget = child.tail
+                    if child.text == "Budget:":
+                        str_budget = child.tail
                     elif child.text == "Gross:":
                         str_gross = child.tail
                         break
-            break # break zadevo malce pohitri
+    
                     
     A=root.findall(".//a[@href]") # metascore, nr_metcritics
     str_meta = ''
@@ -152,25 +156,77 @@ def podatki_filma(root):
     else: drzava = "None"
     if len(str_genre) != 0: genre = re.split(" ", str_genre)[1]
     else: genre = "None"
-    if str_budget != False: budget = re.sub("$|[a-zA-Z]+|\(|,|\)|\s", "", str_budget)
+    if str_budget != False:budget = re.sub("$|[a-zA-Z]+|\(|,|\)|\s", "", str_budget)
     else: budget = "None"
     if str_gross != False: gross = re.sub("$|[a-zA-Z]+|\(|,|\)|\s", "", str_gross)
     else: gross = "None"
-    if str_review != False: nr_reviews = re.split(" ", str_review)[0]
-    else: nr_reviews = "None"
+    if len(str_review) != 0:
+        review = re.split(" ", str_review)
+        nr_reviews = review[0]
+        nr_critics = re.split("\n", review[1])[1]
+ #nr_reviews = re.split(" ", str_review)[0]
+    else:
+        nr_reviews = "None"
+        nr_critics = "None"
     if str_meta != False and len(str_meta) > 2: #         print str_meta
+    #if len(str_meta) > 2: #         print str_meta
         str_meta = re.split("\n", str_meta)
         metascore = re.sub("\s", "",  re.split("/", str_meta[0])[0] )
         nr_metacritic = re.sub("\s", "", str_meta[1])
-    else: metascore = nr_metacritic = "None"
+        #print metascore, nr_metacritic
+    else:
+        metascore = nr_metacritic = "None"
 
-    #print naslov, letnica, str_drzava, duration, genre, rating, nr_users, budget, gross, nr_reviews, metascore, nr_metacritic
-    return naslov.encode('UTF-8'), letnica.encode('UTF-8'), drzava.encode('UTF-8'), duration.encode('UTF-8'), genre.encode('UTF-8'), rating.encode('UTF-8'), nr_users.encode('UTF-8'), budget.encode('UTF-8'), gross.encode('UTF-8'), nr_reviews.encode('UTF-8'), metascore.encode('UTF-8'), nr_metacritic.encode('UTF-8')
+    #print naslov 0, letnica 1, str_drzava 2, duration 3, genre 4, rating 5, nr_users 6, budget 7, gross 8, nr_reviews 9, nr_critics 10, metascore 11, nr_metacritic 12
+    return naslov.encode('UTF-8'), letnica.encode('UTF-8'), drzava.encode('UTF-8'), duration.encode('UTF-8'), genre.encode('UTF-8'), rating.encode('UTF-8'), nr_users.encode('UTF-8'), budget.encode('UTF-8'), gross.encode('UTF-8'), nr_reviews.encode('UTF-8'), nr_critics.encode('UTF-8'), metascore.encode('UTF-8'), nr_metacritic.encode('UTF-8')
 
 
-def zajemi_vse(n):
-    """zajame n filmov in njihove podatke zapise v fajl"""
-    pass
+# Izkaze se, da z nakljucnim iskanjem filmov, ne najdes nicesar - domislil sem se drevesnega nacina iskanja filmov. Zacnes z nekim imdbID-jem in pogledas, kateri filmi so bili vsec ljudem, ki jim je bil vsec ta film. In tako naprej v narobe obrnjeno drevo.
+
+# zajem se je ze zgodil
+def also_like(root):
+    """Vrne filme, ki so jih bili vsec ljudem, ki jim je bil vsec ta film"""
+    DIV = root.findall(".//div[@data-tconst]")#[5].get("content") ## naslov in letnica
+    seznam = []
+    for div in DIV:
+        s = div.get("data-tconst")
+        imdbID = int(re.sub("tt", "", s))
+        if imdbID not in seznam: seznam.append(imdbID)
+    return seznam
+
+
+def drevo_zajem(n, seznam, SEZNAM, N = 1000, ime = "drevo.txt"): # Tukaj bi se dalo kaj rekurzivnega sfurat
+    """N - omejitev stevila filmov, seznam - filmi za pregledat, SEZNAM - ze pregledani filmi
+    Output: #Seznam filmov v drevesu - Bi si zelel - je pa samo file s podatki filmov
+    """
+    #SEZNAM = [startID] # kateri filmi so sedaj za preverit
+    #seznam = [] # kateri filmi bodo za preverit pol
+    i = 0
+    SEZ = []
+    f = open(ime, 'a')
+    #f.write("#ID\timdbID\tletnica\tduration\timdbRating\tnr_users\tgross\tbudget\tnr_reviews\tnr_critics\tmetascore\tnr_metacritics\tdrzava\tzanr\tnaslov\toce\n") # oceta ne bo...
+    for index in seznam:
+        if index not in SEZNAM: # Ce ga se nisem zapisal
+            root = zajem(index)
+            p = podatki_filma(root)
+            sez = also_like(root)
+            try:
+                f.write("%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (n+i+1, index, p[1], p[3], p[5], p[6], p[7], p[8], p[9], p[10], p[11], p[12], p[2], p[4], p[0]) )
+                i += 1
+                print "%d film s podatki: %s\t, %s\ti: %d, %d" % (index, p[0], p[1], i, n+i)
+            except UnicodeEncodeError: # Tezava je v budget in gross za drzave s cudnimi valutami
+                print "film po gobe"
+            for imdbID in sez:
+                if imdbID not in SEZ: SEZ.append(imdbID)
+    n += i
+    SEZNAM += seznam
+    if n > N:
+        f.write("#ID\timdbID\tletnica\tduration\timdbRating\tnr_users\tgross\tbudget\tnr_reviews\tnr_critics\tmetascore\tnr_metacritics\tdrzava\tzanr\tnaslov\toce\n") # oceta ne bo... Z DICTIONARYJEM bi lahko bil
+        f.close()
+        return "Nasel N filmov"
+    else:
+        f.close()
+        drevo_zajem(n, SEZ, SEZNAM, N, ime)
 
 
 #ID    imdbID    naslov    letnica    drzava    runtime    zanr    budget   gross    rating    nr_users    metascore    nr_reviews    nr_critics    nr_metacritic    nr_fb

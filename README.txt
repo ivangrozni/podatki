@@ -41,6 +41,7 @@ TO DO list
    2) Objektno programiranje
    3) Proper Error Handling
    4) Time - merjenje casa - koliko casa program dela...
+   5) Translate to Engrish
 
 ##############################
 
@@ -53,3 +54,13 @@ Manjkajoci podatki imajo vrednost None - veliko je manjkajocih podatkov :(
 
 Dodal se malce errorHandlinga...
 sockettimeout, ker se je program obesal...
+
+##############################
+
+5. Okt 2013
+
+Odpravljene tezave z metascore (narobe je bral)
+Dodal polje nr_critics
+
+Dodal drevesni zajem, kjer isce na podlagi najdenih filmov = Dobra ideja
+Nakljucno iskanje je pocasno in tezavno...
