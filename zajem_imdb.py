@@ -95,7 +95,7 @@ def preveri_film(root): # FILM MORA TUDI BITI KONCAN!!!
 def podatki_filma(root):
     """Poisce podatke:"""
     str_budget = str_gross = str_meta = False
-    str_genre = str_rating = str_duration = str_drzava = str_review = str_critics = ''
+    str_genre = str_rating = str_duration = str_drzava = str_review = str_critics = str_naslov = ''
     # OSNOVNI PODATKI
     META = root.findall(".//meta[@content]")#[5].get("content") ## naslov in letnica
     for meta in META:
@@ -206,26 +206,33 @@ def drevo_zajem(n, seznam, SEZNAM, N = 1000, ime = "drevo.txt"): # Tukaj bi se d
     for index in seznam:
         if index not in SEZNAM: # Ce ga se nisem zapisal
             root = zajem(index)
+            film = preveri_film(root)
             p = podatki_filma(root)
             sez = also_like(root)
-            try:
-                f.write("%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (n+i+1, index, p[1], p[3], p[5], p[6], p[7], p[8], p[9], p[10], p[11], p[12], p[2], p[4], p[0]) )
-                i += 1
-                print "%s film s podatki: %s\t, %s\ti: %d, %d" % (index, p[0], p[1], i, n+i)
-            except UnicodeEncodeError: # Tezava je v budget in gross za drzave s cudnimi valutami
-                print "film po gobe"
+            if film:
+                try:
+                    f.write("%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t\"%s\"\t\"%s\"\t\"%s\"\n" % (n+i+1, index, p[1], p[3], p[5], p[6], p[7], p[8], p[9], p[10], p[11], p[12], p[2], p[4], p[0]) )
+                    i += 1
+                    print "%s film s podatki: %s\t, %s\ti: %d, %d" % (index, p[0], p[1], i, n+i)
+                except UnicodeEncodeError: # Tezava je v budget in gross za drzave s cudnimi valutami
+                    print "film po gobe"
+            else: print "%s not a movie" % index
             for imdbID in sez:
                 if imdbID not in SEZ: SEZ.append(imdbID)
     n += i
     SEZNAM += seznam
     if n > N:
-        f.write("#ID\timdbID\tletnica\tduration\timdbRating\tnr_users\tgross\tbudget\tnr_reviews\tnr_critics\tmetascore\tnr_metacritics\tdrzava\tzanr\tnaslov\toce\n") # oceta ne bo... Z DICTIONARYJEM bi lahko bil
+        f.write("\"ID\"\t\"imdbID\"\t\"letnica\"\t\"duration\"\t\"imdbRating\"\t\"nr_users\"\t\"gross\"\t\"budget\"\t\"nr_reviews\"\t\"nr_critics\"\tmetascore\"\t\"nr_metacritics\"\t\"drzava\"\t\"zanr\"\t\"naslov\"\n") # oceta ne bo... Z DICTIONARYJEM bi lahko bil
         f.close()
         return "Nasel N filmov"
     else:
         f.close()
         drevo_zajem(n, SEZ, SEZNAM, N, ime)
+    return "WTF?"
 
+# V emacsu:
+# execfile("zajem_imdb.py")
+# drevo_zajem(0, ["0055032", "0078935", "0073650"], [], 10, "../drevo3.txt")        
 
 #ID    imdbID    naslov    letnica    drzava    runtime    zanr    budget   gross    rating    nr_users    metascore    nr_reviews    nr_critics    nr_metacritic    nr_fb
 
