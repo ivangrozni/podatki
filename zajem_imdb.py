@@ -216,7 +216,7 @@ def drevo_zajem(n, seznam, SEZNAM, N = 1000, ime = "drevo.txt"): # Tukaj bi se d
     Output: #Seznam filmov v drevesu - Bi si zelel - je pa samo file s podatki filmov
     """
     i = 0
-    SEZ = []
+    SEZ = [] 
     f = open(ime, 'a')
     #f.write("#ID\timdbID\tletnica\tduration\timdbRating\tnr_users\tgross\tbudget\tnr_reviews\tnr_critics\tmetascore\tnr_metacritics\tdrzava\tzanr\tnaslov\toce\n") # oceta ne bo...
     for index in seznam:
@@ -224,7 +224,7 @@ def drevo_zajem(n, seznam, SEZNAM, N = 1000, ime = "drevo.txt"): # Tukaj bi se d
             root = zajem(index)
             film = preveri_film(root)
             p = podatki_filma(root)
-            sez = also_like(root)
+            sez = also_like(root) # also like filmi
             if film:
                 try:
                     f.write("%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t\"%s\"\t\"%s\"\t\"%s\"\n" % (n+i+1, index, p[1], p[3], p[5], p[6], p[7], p[8], p[9], p[10], p[11], p[12], p[2], p[4], p[0]) )
@@ -233,12 +233,13 @@ def drevo_zajem(n, seznam, SEZNAM, N = 1000, ime = "drevo.txt"): # Tukaj bi se d
                 except UnicodeEncodeError: # Tezava je v budget in gross za drzave s cudnimi valutami
                     print "film po gobe"
             else: print "%s not a movie" % index
+            SEZNAM.append(index) # opravil s filmom - ga dam na SEZNAM
             for imdbID in sez:
-                if imdbID not in SEZ: SEZ.append(imdbID)
+                if imdbID not in SEZ and imdbID not in SEZNAM: SEZ.append(imdbID)
     n += i
-    SEZNAM += seznam
+    #SEZNAM += seznam
     if n > N:
-        f.write("\"ID\"\t\"imdbID\"\t\"letnica\"\t\"dur\"\t\"imdbRat\"\t\"nr_users\"\t\"gross\"\t\"budget\"\t\"nr_rev\"\t\"nr_crit\"\tmetasc\"\t\"metacrit\"\t\"drzava\"\t\"zanr\"\t\"naslov\"\n") # oceta ne bo... Z DICTIONARYJEM bi lahko bil
+        #f.write("\"ID\"\t\"imdbID\"\t\"letnica\"\t\"dur\"\t\"imdbRat\"\t\"nr_users\"\t\"gross\"\t\"budget\"\t\"nr_rev\"\t\"nr_crit\"\tmetasc\"\t\"metacrit\"\t\"drzava\"\t\"zanr\"\t\"naslov\"\n") # oceta ne bo... Z DICTIONARYJEM bi lahko bil
         f.close()
         return "Nasel %d filmov" %n
     else:
@@ -284,7 +285,7 @@ def convert(s0):
         return "None"
     else:
         s0 = re.sub(",|\n| |\t", "", s0)
-        print s0
+        #print s0
         x = re.search("[0-9]+", s0)
         value = x.group(0)
         
@@ -299,7 +300,7 @@ def convert(s0):
             valuta = x.group(0)
             if valuta == "RUR": valuta = "RUB"
             st += "%s&from=%s&to=EUR&Calculate=Convert"%(value, valuta)
-        print st
+        #print st
         # Do tukaj sem kul - tudi st je prave oblike
         x = zajem_karkoli(st) # Tole je treba se obdelat...
         #print(etree.tostring(x, xml_declaration=True))
@@ -345,21 +346,10 @@ def obdelaj_pretvorbo(root):
     x = re.split("=", value)
     y = re.search("[0-9]+", x[1])
     value = y.group(0)
-    print value
+    #print value
     return value
 
-"""
-    DIV=root.findall(".//div[@class]") # print len(DIV)
-    for div in DIV: ## budget, gross, drzava(pri release date)
-        if div.get("class") == "txt-block":
-            for child in div:
-                if child.tag == "h4":
-                    if child.text == "Budget:":
-                        str_budget = child.tail
-                    elif child.text == "Gross:":
-                        str_gross = child.tail
-                        break
-"""
+
 #ID    imdbID    naslov    letnica    drzava    runtime    zanr    budget   gross    rating    nr_users    metascore    nr_reviews    nr_critics    nr_metacritic    nr_fb
 
 # IF SOCKET DOES NOT WORK!
