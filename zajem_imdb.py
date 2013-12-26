@@ -220,6 +220,7 @@ def drevo_zajem(n, seznam, SEZNAM, N = 1000, ime = "drevo.txt"): # Tukaj bi se d
     f = open(ime, 'a')
     #f.write("#ID\timdbID\tletnica\tduration\timdbRating\tnr_users\tgross\tbudget\tnr_reviews\tnr_critics\tmetascore\tnr_metacritics\tdrzava\tzanr\tnaslov\toce\n") # oceta ne bo...
     for index in seznam:
+        print index
         if index not in SEZNAM: # Ce ga se nisem zapisal
             root = zajem(index)
             film = preveri_film(root)
@@ -227,7 +228,9 @@ def drevo_zajem(n, seznam, SEZNAM, N = 1000, ime = "drevo.txt"): # Tukaj bi se d
             sez = also_like(root) # also like filmi
             if film:
                 try:
-                    f.write("%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t\"%s\"\t\"%s\"\t\"%s\"\n" % (n+i+1, index, p[1], p[3], p[5], p[6], p[7], p[8], p[9], p[10], p[11], p[12], p[2], p[4], p[0]) )
+                    #print p[2]
+                    drz = skrajsaj_ime(p[2])
+                    f.write("%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t\"%s\"\t\"%s\"\t\"%s\"\n" % (n+i+1, index, p[1], p[3], p[5], p[6], p[7], p[8], p[9], p[10], p[11], p[12], drz, p[4], p[0]) )
                     i += 1
                     print "%s film s podatki: %s\t, %s\ti: %d, %d" % (index, p[0], p[1], i, n+i)
                 except UnicodeEncodeError: # Tezava je v budget in gross za drzave s cudnimi valutami
