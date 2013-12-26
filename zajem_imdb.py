@@ -166,12 +166,12 @@ def podatki_filma(root):
     else: genre = "None"
     # Tole bo treba preuredit... Ne smem samo zavreci, temvec ohranit valuto in jo convertat
     if str_budget != False:
-        print str_budget
+        #print str_budget
         #budget = re.sub("€|$|[a-zA-Z]+|\(|,|\)|\s", "", str_budget)
         budget = convert(str_budget)
     else: budget = "None"
     if str_gross != False:
-        print str_gross
+        #print str_gross
         #gross = re.sub("€|$|[a-zA-Z]+|\(|,|\)|\s", "", str_gross)
         gross = convert(str_gross)
     else: gross = "None"
@@ -288,16 +288,18 @@ def convert(s0):
         #print s0
         x = re.search("[0-9]+", s0)
         value = x.group(0)
-        
+        #s0 = s0.encode('UTF-8')
         if s0[0] == "$": # USD
             st += "%s&from=USD&to=EUR&Calculate=Convert"%value
-        elif s0[0] == "£": # GBP
+        elif ord(s0[0]) == 163: # GBP # Tukaj je problem! £ = u"\xa3"
+            #print "tuki not sem"
             st += "%s&from=GBP&to=EUR&Calculate=Convert"%value
         elif s0[0] == "€":
             return value # Ni treba pretarjat...
         else:
             x = re.search("[A-Z][A-Z][A-Z]", s0)
-            valuta = x.group(0)
+            #print s0, "\t", s0[0], "\t", s0[0]=="£", ord(s0[0])
+            valuta = x.group(0) # rado vrze ven napako...
             if valuta == "RUR": valuta = "RUB"
             st += "%s&from=%s&to=EUR&Calculate=Convert"%(value, valuta)
         #print st
@@ -318,7 +320,7 @@ def zajem_karkoli(st):
         resp = urllib2.urlopen(req)
         the_page = resp.read()
         root = etree.HTML(the_page) # Mogoce bi to moralo biti ze prej...
-        print "\tVracam root"
+        #print "\tVracam root"
         return root # String s stranjo
     except urllib2.HTTPError:
         print "HTTPError"
