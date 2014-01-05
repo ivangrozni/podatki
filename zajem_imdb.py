@@ -18,12 +18,12 @@ def vzorec(n, ime="test.txt", vec_podatkov = True):
     ti = time.time()
     f = open(ime, 'w')
     #f.write("#ID\timdbID\tletnica\tduration\timdbRating\tnr_users\tgross\tbudget\tnr_reviews\tnr_critics\tmetascore\tnr_metacritics\tdrzava\tzanr\tnaslov\n")
-    f.write("\"ID\"\t\"imdbID\"\t\"letnica\"\t\"duration\"\t\"imdbRating\"\t\"nr_users\"\t\"gross\"\t\"budget\"\t\"nr_reviews\"\t\"nr_critics\"\tmetascore\"\t\"nr_metacritics\"\t\"drzava\"\t\"zanr\"\t\"naslov\"\n")
+    f.write("\"ID\"\t\"imdbID\"\t\"letnica\"\t\"dur\"\t\"rating\"\t\"nr_us\"\t\"gross\"\t\"budget\"\t\"nr_rev\"\t\"nr_crit\"\tmetasc\"\t\"metacrit\"\t\"drzava\"\t\"zanr\"\t\"naslov\"\n")
     i = j = nf = 0 # stevec, stevec ne filmov, stevec filmov brez podatkov
     while i<n:
         index = kandidat_str()
         print index
-        film = zajem(index)
+        film = zajem_filma(index)
         if preveri_film(film):
             nf += 1
             p = podatki_filma(film)
@@ -63,26 +63,6 @@ def st_mest(n):
         i+=1
         n = n/10
     return i
-
-def zajem(index):
-    """Pogleda ali je naslov www.imdb.com/tt[index] film in zajame podatke; index = 0096256"""
-    try: #if len(index) == 7 and isinstance(index, basestring):
-        movieURL = "http://www.imdb.com/title/tt%s/"%index
-        req = urllib2.Request(movieURL)
-        resp = urllib2.urlopen(req)
-        the_page = resp.read()
-        #root = etree.HTML(movie)
-        root = etree.HTML(the_page) # Mogoce bi to moralo biti ze prej...
-        return root # String s stranjo
-    except urllib2.HTTPError:
-        print "HTTPError"
-        return etree.HTML("<html>404</html>") #:)
-    except socket.timeout:
-        print "socket.timeout"
-        return etree.HTML("<html>404</html>") #:)
-    except urllib2.URLError:
-        print "URLError"
-        return etree.HTML("<html>404</html>") #:)
 
 def preveri_film(root): # FILM MORA TUDI BITI KONCAN!!!
     """"Preveri, ali je stran (z danim indexom) stran s filmom"""
@@ -151,15 +131,18 @@ def podatki_filma(root):
     try:
         letnica = re.search("[0-9]{4}", str_naslov).group(0)
     except AttributeError:
-        letnica = "None"
+        #letnica = "None"
+        letnica = "0"
 
     if len(str_rating) != 0 and re.search("[0-9]+", str_rating):
         str_rating = re.split(" ", str_rating)
         rating = re.split("/", str_rating[3])[0]
         nr_users = re.sub("\(", "", str_rating[4])
-    else: rating = nr_users = "None"
+    #else: rating = nr_users = "None"
+    else: rating = nr_users = "0"
     if len(str_duration) != 0: duration = re.sub(" min|\s", "", str_duration)
-    else: duration = "None"
+    #else: duration = "None"
+    else: duration = "0"
     if len(str_drzava) != 0: drzava = re.sub("\s", '', str_drzava)#re.sub(" min", "", str_duration)
     else: drzava = "None"
     if len(str_genre) != 0: genre = re.split(" ", str_genre)[1]
@@ -169,21 +152,23 @@ def podatki_filma(root):
         #print str_budget
         #budget = re.sub("€|$|[a-zA-Z]+|\(|,|\)|\s", "", str_budget)
         budget = convert(str_budget)
-    else: budget = "None"
+    #else: budget = "None"
+    else: budget = "0"
     if str_gross != False:
         #print str_gross
         #gross = re.sub("€|$|[a-zA-Z]+|\(|,|\)|\s", "", str_gross)
         gross = convert(str_gross)
-    else: gross = "None"
+    #else: gross = "None"
+    else: gross = "0"
 
     if len(str_review) != 0:
         review = re.split(" ", str_review)
         nr_reviews = review[0]
         nr_critics = re.split("\n", review[1])[1]
- #nr_reviews = re.split(" ", str_review)[0]
+    #nr_reviews = re.split(" ", str_review)[0]
     else:
-        nr_reviews = "None"
-        nr_critics = "None"
+        #nr_reviews = "None"#nr_critics = "None"
+        nr_critics = nr_reviews = "0"
     if str_meta != False and len(str_meta) > 2: #         print str_meta
     #if len(str_meta) > 2: #         print str_meta
         str_meta = re.split("\n", str_meta)
@@ -193,8 +178,12 @@ def podatki_filma(root):
     else:
         metascore = nr_metacritic = "None"
 
+    # uredit moram se naslov - krajsi od 30 znakov
+    naslov = naslov[:30]
+    naslov = re.sub("[\"|']", "#", naslov)
     #print naslov 0, letnica 1, str_drzava 2, duration 3, genre 4, rating 5, nr_users 6, budget 7, gross 8, nr_reviews 9, nr_critics 10, metascore 11, nr_metacritic 12
     return naslov.encode('UTF-8'), letnica.encode('UTF-8'), drzava.encode('UTF-8'), duration.encode('UTF-8'), genre.encode('UTF-8'), rating.encode('UTF-8'), nr_users.encode('UTF-8'), budget.encode('UTF-8'), gross.encode('UTF-8'), nr_reviews.encode('UTF-8'), nr_critics.encode('UTF-8'), metascore.encode('UTF-8'), nr_metacritic.encode('UTF-8')
+    #return naslov.encode('UTF-8'), letnica, drzava.encode('UTF-8'), duration, genre.encode('UTF-8'), rating, nr_users, budget, gross, nr_reviews, nr_critics, metascore, nr_metacritic
 
 
 # Izkaze se, da z nakljucnim iskanjem filmov, ne najdes nicesar - domislil sem se drevesnega nacina iskanja filmov. Zacnes z nekim imdbID-jem in pogledas, kateri filmi so bili vsec ljudem, ki jim je bil vsec ta film. In tako naprej v narobe obrnjeno drevo.
@@ -211,6 +200,7 @@ def also_like(root):
     return seznam
 
 # 0071411, 0018217, 0079944, 0072443, 0069293, 0060107, 0056111, 0058946, 0060390, 0055032, 0053198, 0015648, 0051790, 0091670, 0088846, 0034583, 0083922, 060827, 0036914, 1438535, 0053472, 0057345, 0058898, 0050783, 0053779, 0056215, 0061613, 0063678, 0071502, 0073650, 0056801, 0080539, 0040522, 0065571, 0093191, 0110361, 0068182, 0083946, 0082661, 0080196, 0079083, 0072648, 0071141, 0064588, 0067227
+#sez = ["0363163", "0071411", "0018217", "0079944", "0072443", "0069293", "0060107", "0056111", "0058946", "0060390", "0055032", "0053198", "0015648", "0051790", "0091670", "0088846", "0034583", "0083922", "060827", "0036914", "1438535", "0053472", "0057345", "0058898", "0050783", "0053779", "0056215", "0061613", "0063678", "0071502", "0073650", "0056801", "0080539", "0040522", "0065571", "0093191", "0110361", "0068182", "0083946", "0082661", "0080196", "0079083", "0072648", "0071141", "0064588", "0067227", "0050083", "0317248", "0064116", "0118799", "0027977", "0364569", "0042876", "0071853", "0017136", "0059578", "0079470", "0114787", "0053779", "1156528", "0185125", "0105438", "0064874", "1316540"]
 def drevo_zajem(n, seznam, SEZNAM, N = 1000, ime = "drevo.txt"): # Tukaj bi se dalo kaj rekurzivnega sfurat
     """N - omejitev stevila filmov, seznam - filmi za pregledat, SEZNAM - ze pregledani filmi
     Output: #Seznam filmov v drevesu - Bi si zelel - je pa samo file s podatki filmov
@@ -234,7 +224,7 @@ def drevo_zajem(n, seznam, SEZNAM, N = 1000, ime = "drevo.txt"): # Tukaj bi se d
                     i += 1
                     print "%s film s podatki: %s\t, %s\ti: %d, %d" % (index, p[0], p[1], i, n+i)
                 except UnicodeEncodeError: # Tezava je v budget in gross za drzave s cudnimi valutami
-                    print "film po gobe"
+                    print "unicode error"
             else: print "%s not a movie" % index
             SEZNAM.append(index) # opravil s filmom - ga dam na SEZNAM
             for imdbID in sez:
@@ -267,6 +257,7 @@ def preuredi(ime_in, ime_out):
         z = s[-1]
         z = re.sub("\n", "\"", z)
         s[11] = skrajsaj_ime(s[11])
+        s[11] = re.sub("[\"|']", "#", s[11])
         #print len(s)
         #print "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t\"%s\"\t\"%s\"\t\"%s\n" % (s[0], s[1], s[2], s[3], s[4], s[5], s[6], s[7], s[8], s[9], s[10], s[11], s[12], z )
         g.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t\"%s\"\t\"%s\"\t\"%s\n" % (s[0], s[1], s[2], s[3], s[4], s[5], s[6], s[7], s[8], s[9], s[10], s[11], s[12], z )) #n+i+1, index, p[1], p[3], p[5], p[6], p[7], p[8], p[9], p[10], p[11], p[12], p[2], p[4], p[0]) )
@@ -275,6 +266,8 @@ def preuredi(ime_in, ime_out):
     return None
     
 def skrajsaj_ime(ime_drzave):
+    if ime_drzave == "FederalRepublicofYugoslavia":
+        ime_drzave = "Yugoslavia"
     return ime_drzave[:7]
 
 def convert(s0):
@@ -288,23 +281,31 @@ def convert(s0):
         return "None"
     else:
         s0 = re.sub(",|\n| |\t", "", s0)
-        #print s0
+        print s0, s0[0], ord(s0[0])
+        #s0.encode('UTF-8')
+        #print s0, s0[0], ord(s0[0])
         x = re.search("[0-9]+", s0)
         value = x.group(0)
-        #s0 = s0.encode('UTF-8')
-        if s0[0] == "$": # USD
+        if ord(s0[0]) == 36: # USD
             st += "%s&from=USD&to=EUR&Calculate=Convert"%value
         elif ord(s0[0]) == 163: # GBP # Tukaj je problem! £ = u"\xa3"
-            #print "tuki not sem"
             st += "%s&from=GBP&to=EUR&Calculate=Convert"%value
-        elif s0[0] == "€":
+        elif ord(s0[0]) == 226:
+            print "Tle - euro 226"
+            return value # Ni treba pretarjat...
+        elif ord(s0[0]) == 8364:
+            print "Tle - euro 8364"
             return value # Ni treba pretarjat...
         else:
-            x = re.search("[A-Z][A-Z][A-Z]", s0)
+            try:
+                x = re.search("[A-Z][A-Z][A-Z]", s0)
             #print s0, "\t", s0[0], "\t", s0[0]=="£", ord(s0[0])
-            valuta = x.group(0) # rado vrze ven napako...
-            if valuta == "RUR": valuta = "RUB"
-            st += "%s&from=%s&to=EUR&Calculate=Convert"%(value, valuta)
+                valuta = x.group(0) # rado vrze ven napako...
+                if valuta == "RUR": valuta = "RUB"
+                st += "%s&from=%s&to=EUR&Calculate=Convert"%(value, valuta)
+            except UnicodeEncodeError:
+                print "Convert Error!!!"
+                return "None"
         #print st
         # Do tukaj sem kul - tudi st je prave oblike
         x = zajem_karkoli(st) # Tole je treba se obdelat...
@@ -315,7 +316,8 @@ def convert(s0):
 
 def zajem_karkoli(st):
     """
-    Input: st - string
+    Funkcija, ki vrne eTree objekt iz danega url-ja
+    Input: st - string = url!
     Output: etree - jev objekt :)
     """
     try: #if len(index) == 7 and isinstance(index, basestring):
@@ -331,29 +333,97 @@ def zajem_karkoli(st):
     except socket.timeout:
         print "socket.timeout"
         return etree.HTML("<html>404</html>") #:)
+    except urllib2.URLError:
+        print "URLError"
+        return etree.HTML("<html>404</html>") #:)
+
+def zajem_filma(index):
+    """Pogleda ali je naslov www.imdb.com/tt[index] film in zajame podatke; index = 0096256"""
+    movieURL = "http://www.imdb.com/title/tt%s/"%index
+    return zajem_karkoli(movieURL)
 
 def obdelaj_pretvorbo(root):
-    DIV = root.findall(".//div[@id]")#[5].get("content") ## naslov in letnica
-    for div in DIV:
+    # Pazi- ce dobim nazaj 404!!!
+    try:
+        DIV = root.findall(".//div[@id]")#[5].get("content") ## naslov in letnica
+        for div in DIV:
         #print div.get("id")
-        if div.get("id") == "converter_results": # priti moram do <td class="rightCol">, td.text
+            if div.get("id") == "converter_results": # priti moram do <td class="rightCol">, td.text
             #print "Nasel..."
-            for child in div:
+                for child in div:
                 #print child.tag, child.text
-                for child2 in child:
+                    for child2 in child:
                     #print "\t", child2.tag, child2.text
-                    for child3 in child2:
+                        for child3 in child2:
                         #print "\t\t", child3.tag, child3.text
-                        if child3.tag == "b":
-                            value = child3.text # To je treba se obdelat :)
-            
-            break
-    x = re.split("=", value)
-    y = re.search("[0-9]+", x[1])
-    value = y.group(0)
-    #print value
-    return value
+                            if child3.tag == "b":
+                                value = child3.text # To je treba se obdelat :)
+                                x = re.split("=", value)
+                                y = re.search("[0-9]+", x[1])
+                                value = y.group(0)
+                                return value
+    except:
+        e = sys.exc_info()[0]
+        print  "obdelava pretvorbe <p>Error: %s</p>" % e
+        return "0"
 
+def drevo_zajem_neamer(n, seznam, SEZNAM, N = 1000, ime = "drevo.txt"): # Tukaj bi se dalo kaj rekurzivnega sfurat
+    """N - omejitev stevila filmov, seznam - filmi za pregledat, SEZNAM - ze pregledani filmi
+    Output: #Seznam filmov v drevesu - Bi si zelel - je pa samo file s podatki filmov
+    """
+    i = 0
+    SEZ = [] 
+    f = open(ime, 'a')
+    #f.write("#ID\timdbID\tletnica\tduration\timdbRating\tnr_users\tgross\tbudget\tnr_reviews\tnr_critics\tmetascore\tnr_metacritics\tdrzava\tzanr\tnaslov\toce\n") # oceta ne bo...
+    for index in seznam:
+        print index
+        if index not in SEZNAM: # Ce ga se nisem zapisal
+            root = zajem(index)
+            film = preveri_film(root)
+            p = podatki_filma(root)
+            sez = also_like(root) # also like filmi
+            if film:
+                if p[2] == "FederalRepublicofYugoslavia":
+                    print "Yugoslavia :)"
+                    drz = "Yugoslavia"
+                try:
+                    if p[2] == "USA":
+                        print "Fuje"
+                    else:
+                        drz = skrajsaj_ime(p[2])
+                        f.write("%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t\"%s\"\t\"%s\"\t\"%s\"\n" % (n+i+1, index, p[1], p[3], p[5], p[6], p[7], p[8], p[9], p[10], p[11], p[12], drz, p[4], p[0]) )
+                        i += 1
+                        print "%s film s podatki: %s\t, %s\ti: %d, %d" % (index, p[0], p[1], i, n+i)
+                except: # Tezava je v budget in gross za drzave s cudnimi valutami
+                    e = sys.exc_info()[0]
+                    print  "Drevo zajem: <p>Error: %s</p>" % e
+            else: print "%s not a movie" % index
+            SEZNAM.append(index) # opravil s filmom - ga dam na SEZNAM
+            for imdbID in sez:
+                if imdbID not in SEZ and imdbID not in SEZNAM: SEZ.append(imdbID)
+    n += i
+    #SEZNAM += seznam
+    if n > N:
+        #f.write("\"ID\"\t\"imdbID\"\t\"letnica\"\t\"dur\"\t\"imdbRat\"\t\"nr_users\"\t\"gross\"\t\"budget\"\t\"nr_rev\"\t\"nr_crit\"\tmetasc\"\t\"metacrit\"\t\"drzava\"\t\"zanr\"\t\"naslov\"\n") # oceta ne bo... Z DICTIONARYJEM bi lahko bil
+        f.close()
+        return "Nasel %d filmov" %n
+    else:
+        f.close()
+        drevo_zajem_neamer(n, SEZ, SEZNAM, N, ime)
+    print "Zajteih %d filmov" % len(SEZNAM)
+    return SEZNAM, seznam
+
+
+# TO DO
+  # Obdelaj pretvorbo!!!  - DONE
+  # Neameriski filmi!!!   - 
+  # V Naslovu ne sme bit ' in "
+  # R
+    # Histogram po drzavah
+    # Histogram po letnicah
+    # Histogram po ocenah
+    # Odvisnost ocen od budgeta/gross
+    
 
 #ID    imdbID    naslov    letnica    drzava    runtime    zanr    budget   gross    rating    nr_users    metascore    nr_reviews    nr_critics    nr_metacritic    nr_fb
 
