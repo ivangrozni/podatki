@@ -37,11 +37,11 @@ NUJNI TO DO list:
       #1) Film po gobe: Unicode Encode Error  (treba je znake, ki jih ne zna kodirat z necim zamenjat) [SOLVED]
 
 TO DO list
-   1) Kodo naredi preglednejso
+   1) Kodo naredi preglednejso  DONE
    2) Objektno programiranje
-   3) Proper Error Handling
-   4) Time - merjenje casa - koliko casa program dela...
-   5) Translate to Engrish
+   3) Proper Error Handling     DONE
+   4) Time - merjenje casa - koliko casa program dela...  DONE
+   5) Translate to Engrish    
 
 ##############################
 
@@ -64,3 +64,15 @@ Dodal polje nr_critics
 
 Dodal drevesni zajem, kjer isce na podlagi najdenih filmov = Dobra ideja
 Nakljucno iskanje je pocasno in tezavno...
+
+
+13. Aug 2014
+
+Zakljucna dela.
+Imamo grafe v R: 
+ - razporeditev po zanrih
+ - letnice, trajanje
+ - ocene
+
+TO DO:
+ - en normalen graf, ki bo kazal neko korelacijo
